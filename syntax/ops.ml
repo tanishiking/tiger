@@ -20,4 +20,21 @@ and pretty_exp exp =
   | VarExp var -> pretty_var var
   | AssignExp { var = v; exp = e; pos = p } ->
       pretty_var v ^ ":=" ^ pretty_exp e ^ string_of_pos p
+  | OpExp { left = l; oper = op; right = r; pos = p } ->
+      pretty_exp l ^ pretty_op op ^ pretty_exp r ^ string_of_pos p
   | _ -> "not implemented"
+
+and pretty_op op =
+  match op with
+  | PlusOp -> "+"
+  | MinusOp -> "-"
+  | TimesOp -> "*"
+  | DivideOp -> "/"
+  | EqOp -> "="
+  | NeqOp -> "<>"
+  | LtOp -> "<"
+  | GtOp -> ">"
+  | LeOp -> "<="
+  | GeOp -> ">="
+  | AndOp -> "&"
+  | OrOp -> "|"

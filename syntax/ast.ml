@@ -65,6 +65,8 @@ and oper =
   | LeOp
   | GtOp
   | GeOp
+  | AndOp
+  | OrOp
 
 and field = { name : symbol; escape : bool ref; typ : symbol; pos : pos }
 

@@ -5,7 +5,7 @@ open Parser
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 let id = alpha+ (alpha | digit | '_')*
-let num = '-'? digit digit*
+let num = digit digit*
 let ws = ['\t' ' ' '\n']
 
 rule token = parse
@@ -18,6 +18,18 @@ rule token = parse
   | ":="      { ASSIGN }
   | "["       { LBRACKET }
   | "]"       { RBRACKET }
+  | "+"       { PLUS }
+  | "-"       { MINUS }
+  | "*"       { TIMES }
+  | "/"       { DIVIDE }
+  | "="       { EQ }
+  | "<>"      { NEQ }
+  | "<"       { LT }
+  | ">"       { GT }
+  | "<="      { LE }
+  | ">="      { GE }
+  | "&"       { AND }
+  | "|"       { OR }
   | eof       { EOF }
 
 and string buf = parse

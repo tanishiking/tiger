@@ -10,6 +10,9 @@ let rec cmp_exp e1 e2 =
   | ( AssignExp { var = v1; exp = e1; pos = _ },
       AssignExp { var = v2; exp = e2; pos = _ } ) ->
       cmp_var v1 v2 && cmp_exp e1 e2
+  | ( OpExp { left = l1; oper = op1; right = r1; pos = _ },
+      OpExp { left = l2; oper = op2; right = r2; pos = _ } ) ->
+      cmp_exp l1 l2 && op1 = op2 && cmp_exp r1 r2
   | _ -> false
 
 and cmp_var v1 v2 =
