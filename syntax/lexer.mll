@@ -30,6 +30,9 @@ rule token = parse
   | ">="      { GE }
   | "&"       { AND }
   | "|"       { OR }
+  | "("       { LPAREN }
+  | ")"       { RPAREN }
+  | ","       { COMMA }
   | eof       { EOF }
 
 and string buf = parse

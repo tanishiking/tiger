@@ -6,10 +6,10 @@
 %token <string>        STR
 %token <Symbol.symbol> ID
 %token                 EOF
-%token NIL
-%token DOT
+%token NIL DOT COMMA
 %token ASSIGN
 %token LBRACKET RBRACKET
+%token LPAREN RPAREN
 %token PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR
 
 %nonassoc ASSIGN
@@ -41,7 +41,18 @@ expr:
   | v = var
     { VarExp v }
   | lvalue=var ASSIGN e=expr
-    { AssignExp {var=lvalue; exp=e; pos=to_pos($startpos)}}
+    { AssignExp {var=lvalue; exp=e; pos=to_pos($startpos)} }
+  | name=ID LPAREN args=argseq RPAREN
+    { CallExp { func=name; args=args; pos=to_pos($startpos) } }
+
+argseq:
+    /* empty */ {[]}
+  | expr argseq_ {$1 :: $2}
+  ;
+
+argseq_:
+    /* empty */ {[]}
+  | COMMA expr argseq_ {$2 :: $3}
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }

@@ -42,4 +42,19 @@ let basic_suite =
                 pos = fake_pos;
               })
            "obj := 1";
+         basic_parse_test "basic_call"
+           (CallExp
+              {
+                func = fake_sym "func";
+                args =
+                  [
+                    VarExp (SimpleVar (fake_sym "x", fake_pos));
+                    VarExp (SimpleVar (fake_sym "y", fake_pos));
+                  ];
+                pos = fake_pos;
+              })
+           "func(x, y)";
+         basic_parse_test "call_empty"
+           (CallExp { func = fake_sym "func"; args = []; pos = fake_pos })
+           "func()";
        ]
