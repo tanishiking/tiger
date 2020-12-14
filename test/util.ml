@@ -1,6 +1,5 @@
 open OUnit2
 open Syntax
-open Cmp
 open Syntax.Ast
 open Syntax.Symbol
 
@@ -17,4 +16,4 @@ let fake_sym name = mk_symbol name 0
 *)
 let basic_parse_test name expected input =
   name >:: fun _ ->
-  assert_equal expected (parse input) ~printer:show_exp ~cmp:cmp_exp
+  assert_equal expected (parse input) ~printer:show_exp ~cmp:equal_exp
