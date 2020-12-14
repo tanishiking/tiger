@@ -35,6 +35,7 @@ rule token = parse
   | "{"       { LBRACE }
   | "}"       { RBRACE }
   | ","       { COMMA }
+  | ";"       { SEMICOLON }
   | eof       { EOF }
 
 and string buf = parse

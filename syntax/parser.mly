@@ -6,7 +6,7 @@
 %token <string>        STR
 %token <Symbol.symbol> ID
 %token                 EOF
-%token NIL DOT COMMA
+%token NIL DOT COMMA SEMICOLON
 %token ASSIGN
 %token LBRACKET RBRACKET
 %token LPAREN RPAREN
@@ -47,6 +47,9 @@ expr:
     { CallExp { func=name; args=args; pos=to_pos($startpos) } }
   | name=ID LBRACE fields=fieldseq RBRACE
     { RecordExp { fields=fields; typ=name; pos=to_pos($startpos) } }
+  | LPAREN es=expseq RPAREN
+    { SeqExp es }
+
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }
@@ -70,6 +73,16 @@ fieldseq :
 fieldseq_ :
     /* empty */ {[]}
   | COMMA k=ID EQ v=expr rest=fieldseq_ {(k, v, to_pos($startpos)) :: rest}
+  ;
+
+expseq :
+    /* empty */ {[]}
+  | expr expseq_ { ($1, to_pos($startpos)) :: $2}
+  ;
+
+expseq_ :
+    /* empty */ {[]}
+  | SEMICOLON expr expseq_ { ($2, to_pos($startpos)) :: $3}
   ;
 
 %inline binop:

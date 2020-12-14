@@ -72,4 +72,28 @@ let basic_suite =
          basic_parse_test "record_creation_empty"
            (RecordExp { fields = []; typ = fake_sym "pos"; pos = fake_pos })
            "pos { }";
+         basic_parse_test "empty_sequencing" (SeqExp []) "()";
+         basic_parse_test "sequencing_int_int"
+           (SeqExp [ (IntExp 1, fake_pos); (IntExp 2, fake_pos) ])
+           "(1; 2)";
+         basic_parse_test "sequencing_assign_int"
+           (SeqExp
+              [
+                ( AssignExp
+                    {
+                      var = SimpleVar (fake_sym "x", fake_pos);
+                      exp = IntExp 1;
+                      pos = fake_pos;
+                    },
+                  fake_pos );
+                ( OpExp
+                    {
+                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      oper = PlusOp;
+                      right = IntExp 1;
+                      pos = fake_pos;
+                    },
+                  fake_pos );
+              ])
+           "(x := 1; x + 1)";
        ]
