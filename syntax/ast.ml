@@ -1,18 +1,16 @@
+open Symbol
+
 type symbol = Symbol.symbol
 
-type pos = { lnum : int; bol : int }
+type pos = { lnum : int; bol : int } [@@deriving show]
 
 let to_pos (p : Lexing.position) : pos = { lnum = p.pos_lnum; bol = p.pos_bol }
-
-(**
-  @param lnum - line number.
-  @param bol - offset from beginning of line.
-*)
 
 type var =
   | SimpleVar of symbol * pos
   | FieldVar of var * symbol * pos
   | SubscriptVar of var * exp * pos
+[@@deriving show]
 
 and exp =
   | NilExp
@@ -37,6 +35,7 @@ and exp =
   | BreakExp of pos
   | LetExp of { decs : dec list; body : exp; pos : pos }
   | ArrayExp of { typ : symbol; size : exp; init : exp; pos : pos }
+[@@deriving show]
 
 and dec =
   | FunctionDec of fundec list
@@ -48,11 +47,13 @@ and dec =
       pos : pos;
     }
   | TypeDec of typedec list
+[@@deriving show]
 
 and ty =
   | NameTy of symbol * pos
   | RecordTy of field list
   | ArrayTy of symbol * pos
+[@@deriving show]
 
 and oper =
   | PlusOp
@@ -67,8 +68,10 @@ and oper =
   | GeOp
   | AndOp
   | OrOp
+[@@deriving show]
 
 and field = { name : symbol; escape : bool ref; typ : symbol; pos : pos }
+[@@deriving show]
 
 and fundec = {
   funname : symbol;
@@ -77,5 +80,6 @@ and fundec = {
   body : exp;
   funpos : pos;
 }
+[@@deriving show]
 
-and typedec = { tyname : symbol; ty : ty; typos : pos }
+and typedec = { tyname : symbol; ty : ty; typos : pos } [@@deriving show]

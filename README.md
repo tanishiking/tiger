@@ -5,7 +5,7 @@ Tiger language implementation in OCaml.
 
 ## Setup
 ```sh
-$ opam install dune menhir ounit2
+$ opam install dune menhir ounit2 ppx_deriving
 ```
 
 ## Build

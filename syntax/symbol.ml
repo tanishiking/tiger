@@ -1,4 +1,4 @@
-type symbol = string * int
+type symbol = string * int [@@deriving show]
 
 let nextsym = ref 0
 
