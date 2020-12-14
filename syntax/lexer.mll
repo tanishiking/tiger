@@ -32,6 +32,8 @@ rule token = parse
   | "|"       { OR }
   | "("       { LPAREN }
   | ")"       { RPAREN }
+  | "{"       { LBRACE }
+  | "}"       { RBRACE }
   | ","       { COMMA }
   | eof       { EOF }
 

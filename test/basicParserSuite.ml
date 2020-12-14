@@ -57,4 +57,19 @@ let basic_suite =
          basic_parse_test "call_empty"
            (CallExp { func = fake_sym "func"; args = []; pos = fake_pos })
            "func()";
+         basic_parse_test "basic_record_creation"
+           (RecordExp
+              {
+                fields =
+                  [
+                    (fake_sym "line", IntExp 1, fake_pos);
+                    (fake_sym "col", IntExp 2, fake_pos);
+                  ];
+                typ = fake_sym "pos";
+                pos = fake_pos;
+              })
+           "pos { line = 1, col = 2 }";
+         basic_parse_test "record_creation_empty"
+           (RecordExp { fields = []; typ = fake_sym "pos"; pos = fake_pos })
+           "pos { }";
        ]

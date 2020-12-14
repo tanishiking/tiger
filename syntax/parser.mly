@@ -10,6 +10,7 @@
 %token ASSIGN
 %token LBRACKET RBRACKET
 %token LPAREN RPAREN
+%token LBRACE RBRACE
 %token PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR
 
 %nonassoc ASSIGN
@@ -44,6 +45,13 @@ expr:
     { AssignExp {var=lvalue; exp=e; pos=to_pos($startpos)} }
   | name=ID LPAREN args=argseq RPAREN
     { CallExp { func=name; args=args; pos=to_pos($startpos) } }
+  | name=ID LBRACE fields=fieldseq RBRACE
+    { RecordExp { fields=fields; typ=name; pos=to_pos($startpos) } }
+
+var:
+  | v=ID  { SimpleVar (v, to_pos($startpos)) }
+  | v=var DOT f=ID { FieldVar (v, f, to_pos($startpos)) }
+  | v=var LBRACKET e=expr RBRACKET { SubscriptVar (v, e, to_pos($startpos)) }
 
 argseq:
     /* empty */ {[]}
@@ -54,10 +62,15 @@ argseq_:
     /* empty */ {[]}
   | COMMA expr argseq_ {$2 :: $3}
 
-var:
-  | v=ID  { SimpleVar (v, to_pos($startpos)) }
-  | v=var DOT f=ID { FieldVar (v, f, to_pos($startpos)) }
-  | v=var LBRACKET e=expr RBRACKET {  SubscriptVar (v, e, to_pos($startpos)) }
+fieldseq :
+    /* empty */ {[]}
+  | k=ID EQ v=expr rest=fieldseq_ {(k, v, to_pos($startpos)) :: rest}
+  ;
+
+fieldseq_ :
+    /* empty */ {[]}
+  | COMMA k=ID EQ v=expr rest=fieldseq_ {(k, v, to_pos($startpos)) :: rest}
+  ;
 
 %inline binop:
   | PLUS { PlusOp }
