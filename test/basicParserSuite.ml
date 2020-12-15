@@ -156,4 +156,37 @@ let basic_suite =
                 pos = fake_pos;
               })
            "while x < 10 do x := x + 1";
+         basic_parse_test "for_loop"
+           (ForExp
+              {
+                var = fake_sym "x";
+                lo = IntExp 0;
+                hi = IntExp 10;
+                body =
+                  AssignExp
+                    {
+                      var = SimpleVar (fake_sym "x", fake_pos);
+                      exp =
+                        OpExp
+                          {
+                            left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                            oper = PlusOp;
+                            right = IntExp 1;
+                            pos = fake_pos;
+                          };
+                      pos = fake_pos;
+                    };
+                pos = fake_pos;
+              })
+           "for x := 0 to 10 do x := x + 1";
+         basic_parse_test "break" (BreakExp fake_pos) "break";
+         basic_parse_test "array"
+           (ArrayExp
+              {
+                typ = fake_sym "str";
+                size = IntExp 100;
+                init = StringExp ("", fake_pos);
+                pos = fake_pos;
+              })
+           "str @ [100] of \"\"";
        ]

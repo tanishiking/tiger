@@ -14,10 +14,14 @@
 %token PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR
 %token WHILE DO
 %token IF THEN ELSE
+%token FOR TO
+%token AT
+%token BREAK OF
 
-%nonassoc DO THEN
+%nonassoc DO THEN OF
 %nonassoc ELSE
 %nonassoc ASSIGN
+
 %left OR
 %left AND
 %nonassoc EQ NEQ LT GT GE LE
@@ -26,7 +30,6 @@
 %nonassoc UMINUS
 
 %start <Ast.exp> prog
-
 
 %%
 
@@ -42,6 +45,10 @@ expr:
     { IfExp { test=test; then'=t; else'=Some e; pos=to_pos($startpos)} }
   | WHILE test=expr DO body=expr
     { WhileExp {test=test; body=body; pos=to_pos($startpos)} }
+  | FOR id=ID ASSIGN lo=expr TO hi=expr DO body=expr
+    { ForExp { var=id; lo=lo; hi=hi; body=body; pos=to_pos($startpos) } }
+  | BREAK
+    { BreakExp (to_pos($startpos)) }
   | LPAREN es=expseq RPAREN
     { SeqExp es }
   | i = INT
@@ -60,6 +67,9 @@ expr:
     { CallExp { func=name; args=args; pos=to_pos($startpos) } }
   | name=ID LBRACE fields=fieldseq RBRACE
     { RecordExp { fields=fields; typ=name; pos=to_pos($startpos) } }
+  | /* Added @ between ID and LBRACKET to avoid conflict (is there a way to avoid it ?) */
+    typ=ID AT LBRACKET size=expr RBRACKET OF init=expr
+    { ArrayExp { typ=typ; size=size; init=init; pos=to_pos($startpos) } }
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }

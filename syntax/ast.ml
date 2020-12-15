@@ -28,17 +28,10 @@ and exp =
   | SeqExp of (exp * pos) list
   | IfExp of { test : exp; then' : exp; else' : exp option; pos : pos }
   | WhileExp of { test : exp; body : exp; pos : pos }
-  | ForExp of {
-      var : symbol;
-      escape : bool ref;
-      lo : exp;
-      hi : exp;
-      body : exp;
-      pos : pos;
-    }
+  | ForExp of { var : symbol; lo : exp; hi : exp; body : exp; pos : pos }
   | BreakExp of pos
-  | LetExp of { decs : dec list; body : exp; pos : pos }
   | ArrayExp of { typ : symbol; size : exp; init : exp; pos : pos }
+  | LetExp of { decs : dec list; body : exp; pos : pos }
 [@@deriving show, eq]
 
 and dec =

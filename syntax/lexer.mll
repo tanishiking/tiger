@@ -18,6 +18,11 @@ rule token = parse
   | "else"    { ELSE }
   | "while"   { WHILE }
   | "do"      { DO }
+  | "for"     { FOR }
+  | "to"      { TO }
+  | "break"   { BREAK }
+  | "of"      { OF }
+  | "@"       { AT }
   | '.'       { DOT }
   | ":="      { ASSIGN }
   | "["       { LBRACKET }
