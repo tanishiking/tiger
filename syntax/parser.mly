@@ -12,7 +12,11 @@
 %token LPAREN RPAREN
 %token LBRACE RBRACE
 %token PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR
+%token WHILE DO
+%token IF THEN ELSE
 
+%nonassoc DO THEN
+%nonassoc ELSE
 %nonassoc ASSIGN
 %left OR
 %left AND
@@ -23,6 +27,7 @@
 
 %start <Ast.exp> prog
 
+
 %%
 
 prog:
@@ -30,13 +35,21 @@ prog:
       { e }
 
 expr:
+  | NIL { NilExp }
+  | IF test=expr THEN t=expr
+    { IfExp { test=test; then'=t; else'=None; pos=to_pos($startpos)} }
+  | IF test=expr THEN t=expr ELSE e=expr
+    { IfExp { test=test; then'=t; else'=Some e; pos=to_pos($startpos)} }
+  | WHILE test=expr DO body=expr
+    { WhileExp {test=test; body=body; pos=to_pos($startpos)} }
+  | LPAREN es=expseq RPAREN
+    { SeqExp es }
   | i = INT
     { IntExp i }
   | MINUS e = expr %prec UMINUS
     { OpExp { left=IntExp 0; oper=MinusOp; right=e; pos=to_pos($startpos)} }
   | l=expr o=binop r=expr
     { OpExp { left=l; oper=o; right=r; pos=to_pos($startpos) } }
-  | NIL { NilExp }
   | s = STR
     { StringExp (s, to_pos($startpos)) }
   | v = var
@@ -47,9 +60,6 @@ expr:
     { CallExp { func=name; args=args; pos=to_pos($startpos) } }
   | name=ID LBRACE fields=fieldseq RBRACE
     { RecordExp { fields=fields; typ=name; pos=to_pos($startpos) } }
-  | LPAREN es=expseq RPAREN
-    { SeqExp es }
-
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }

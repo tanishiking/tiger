@@ -6,5 +6,5 @@
 (ocamllex lexer)
 
 (menhir
- ; (flags -v --trace)
- (modules parser))
+ (modules parser)
+ (flags --explain))

@@ -13,7 +13,11 @@ rule token = parse
   | "nil"     { NIL }
   | num as n  { INT (int_of_string n) }
   | '"'       { string (Buffer.create 0) lexbuf }
-  | id as i   { ID (Symbol.symbol i) }
+  | "if"      { IF }
+  | "then"    { THEN }
+  | "else"    { ELSE }
+  | "while"   { WHILE }
+  | "do"      { DO }
   | '.'       { DOT }
   | ":="      { ASSIGN }
   | "["       { LBRACKET }
@@ -37,6 +41,7 @@ rule token = parse
   | ","       { COMMA }
   | ";"       { SEMICOLON }
   | eof       { EOF }
+  | id as i   { ID (Symbol.symbol i) }
 
 and string buf = parse
   | '"'       { STR (Buffer.contents buf) }

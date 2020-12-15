@@ -96,4 +96,64 @@ let basic_suite =
                   fake_pos );
               ])
            "(x := 1; x + 1)";
+         basic_parse_test "if_then"
+           (IfExp
+              {
+                test =
+                  OpExp
+                    {
+                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      oper = EqOp;
+                      right = IntExp 1;
+                      pos = fake_pos;
+                    };
+                then' = VarExp (SimpleVar (fake_sym "id", fake_pos));
+                else' = None;
+                pos = fake_pos;
+              })
+           "if x = 1 then x";
+         basic_parse_test "if_then_else"
+           (IfExp
+              {
+                test =
+                  OpExp
+                    {
+                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      oper = EqOp;
+                      right = IntExp 1;
+                      pos = fake_pos;
+                    };
+                then' = VarExp (SimpleVar (fake_sym "id", fake_pos));
+                else' = Some (IntExp 1);
+                pos = fake_pos;
+              })
+           "if x = 1 then x else 1";
+         basic_parse_test "while_do"
+           (WhileExp
+              {
+                test =
+                  OpExp
+                    {
+                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      oper = LtOp;
+                      right = IntExp 10;
+                      pos = fake_pos;
+                    };
+                body =
+                  AssignExp
+                    {
+                      var = SimpleVar (fake_sym "x", fake_pos);
+                      exp =
+                        OpExp
+                          {
+                            left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                            oper = PlusOp;
+                            right = IntExp 1;
+                            pos = fake_pos;
+                          };
+                      pos = fake_pos;
+                    };
+                pos = fake_pos;
+              })
+           "while x < 10 do x := x + 1";
        ]
