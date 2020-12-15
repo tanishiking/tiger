@@ -107,7 +107,7 @@ let basic_suite =
                       right = IntExp 1;
                       pos = fake_pos;
                     };
-                then' = VarExp (SimpleVar (fake_sym "id", fake_pos));
+                then' = VarExp (SimpleVar (fake_sym "x", fake_pos));
                 else' = None;
                 pos = fake_pos;
               })
@@ -123,7 +123,7 @@ let basic_suite =
                       right = IntExp 1;
                       pos = fake_pos;
                     };
-                then' = VarExp (SimpleVar (fake_sym "id", fake_pos));
+                then' = VarExp (SimpleVar (fake_sym "x", fake_pos));
                 else' = Some (IntExp 1);
                 pos = fake_pos;
               })

@@ -1,4 +1,5 @@
-type symbol = (string * int[@equal fun _ _ -> true]) [@@deriving show, eq]
+type symbol = (string * int[@equal fun (a, _) (b, _) -> a = b])
+[@@deriving show, eq]
 
 let nextsym = ref 0
 
