@@ -28,6 +28,8 @@ rule token = parse
   | "var"     { VAR }
   | "function" { FUNCTION }
   | "and"     { AND }
+  | "type"    { TYPE }
+  | "array"   { ARRAY }
   | "@"       { AT }
   | '.'       { DOT }
   | ":="      { ASSIGN }

@@ -17,7 +17,7 @@
 %token FOR TO
 %token AT
 %token BREAK OF
-%token LET IN END VAR FUNCTION AND
+%token LET IN END VAR FUNCTION AND TYPE ARRAY
 
 %nonassoc DO THEN OF
 %nonassoc ELSE
@@ -78,6 +78,8 @@ dec :
   | d=vardec { d }
   | fs=separated_nonempty_list(AND, fundec) /* Add "and" between fundecs to avoid shift/reduce conflict */
     { FunctionDec fs }
+  | ts=separated_nonempty_list(AND, tydec) /* Add "and" between fundecs to avoid shift/reduce conflict */
+    { TypeDec ts }
 
 vardec:
   | VAR v=ID t=type_constraint ASSIGN e=expr
@@ -94,6 +96,18 @@ fundec:
 tyfield :
   | name=ID COLON typ=ID
     { { name=name; typ=typ; pos=to_pos($startpos) } }
+
+tydec:
+ | TYPE name=ID EQ ty=ty
+   { { tyname=name; ty=ty; typos=to_pos($startpos) } }
+
+ty:
+ | ty=ID
+   { NameTy (ty, to_pos($startpos))}
+ | LBRACE fields=separated_list(COMMA, tyfield) RBRACE
+   { RecordTy fields }
+ | ARRAY OF typ=ID
+   { ArrayTy (typ, to_pos($startpos)) }
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }
