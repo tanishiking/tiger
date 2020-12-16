@@ -26,6 +26,8 @@ rule token = parse
   | "in"      { IN }
   | "end"     { END }
   | "var"     { VAR }
+  | "function" { FUNCTION }
+  | "and"     { AND }
   | "@"       { AT }
   | '.'       { DOT }
   | ":="      { ASSIGN }
@@ -41,8 +43,8 @@ rule token = parse
   | ">"       { GT }
   | "<="      { LE }
   | ">="      { GE }
-  | "&"       { AND }
-  | "|"       { OR }
+  | "&"       { LAND }
+  | "|"       { LOR }
   | "("       { LPAREN }
   | ")"       { RPAREN }
   | "{"       { LBRACE }

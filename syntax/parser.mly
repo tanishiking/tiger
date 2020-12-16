@@ -11,20 +11,20 @@
 %token LBRACKET RBRACKET
 %token LPAREN RPAREN
 %token LBRACE RBRACE
-%token PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR
+%token PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE LAND LOR
 %token WHILE DO
 %token IF THEN ELSE
 %token FOR TO
 %token AT
 %token BREAK OF
-%token LET IN END VAR
+%token LET IN END VAR FUNCTION AND
 
 %nonassoc DO THEN OF
 %nonassoc ELSE
 %nonassoc ASSIGN
 
-%left OR
-%left AND
+%left LOR
+%left LAND
 %nonassoc EQ NEQ LT GT GE LE
 %left PLUS MINUS
 %left TIMES DIVIDE
@@ -81,15 +81,25 @@ decs :
 
 dec : 
   | d=vardec { d }
-  ;
+  | fs=separated_nonempty_list(AND, fundec) /* Add "and" between fundecs to avoid shift/reduce conflict */
+    { FunctionDec fs }
 
 vardec:
- | VAR v=ID t=type_constraint ASSIGN e=expr
-   { VarDec { name=v; typ=t; init=e; pos=to_pos($startpos) } }
+  | VAR v=ID t=type_constraint ASSIGN e=expr
+    { VarDec { name=v; typ=t; init=e; pos=to_pos($startpos) } }
 
 type_constraint:
- | c=option(COLON t=ID { (t, to_pos($startpos)) })
-   { c }
+  | c=option(COLON t=ID { (t, to_pos($startpos)) })
+    { c }
+
+fundec:
+  | FUNCTION name=ID LPAREN params=separated_list(COMMA, tyfield) RPAREN result=type_constraint EQ body=expr
+    { { funname=name; params=params; result=result; body=body; funpos=to_pos($startpos)} }
+
+tyfield :
+  | name=ID COLON typ=ID
+    { { name=name; typ=typ; pos=to_pos($startpos) } }
+  ;
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }
@@ -136,5 +146,5 @@ expseq_ :
   | LE { LeOp }
   | GT { GtOp }
   | GE { GeOp }
-  | AND { AndOp }
-  | OR { OrOp }
+  | LAND { AndOp }
+  | LOR { OrOp }

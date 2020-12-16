@@ -66,8 +66,7 @@ and oper =
   | OrOp
 [@@deriving show, eq]
 
-and field = { name : symbol; escape : bool ref; typ : symbol; pos : pos }
-[@@deriving show, eq]
+and field = { name : symbol; typ : symbol; pos : pos } [@@deriving show, eq]
 
 and fundec = {
   funname : symbol;

@@ -155,4 +155,95 @@ let parse_letexp_suite =
                 pos = fake_pos;
               })
            "let var x: int := 6 in let var y: int := 6 in print(x) end end";
+         basic_parse_test "function"
+           (LetExp
+              {
+                decs =
+                  [
+                    FunctionDec
+                      [
+                        {
+                          funname = fake_sym "inc";
+                          params =
+                            [
+                              {
+                                name = fake_sym "x";
+                                typ = fake_sym "int";
+                                pos = fake_pos;
+                              };
+                            ];
+                          result = Some (fake_sym "int", fake_pos);
+                          body =
+                            OpExp
+                              {
+                                left =
+                                  VarExp (SimpleVar (fake_sym "x", fake_pos));
+                                oper = PlusOp;
+                                right = IntExp 1;
+                                pos = fake_pos;
+                              };
+                          funpos = fake_pos;
+                        };
+                      ];
+                  ];
+                body =
+                  SeqExp
+                    [
+                      ( CallExp
+                          {
+                            func = fake_sym "inc";
+                            args = [ IntExp 1 ];
+                            pos = fake_pos;
+                          },
+                        fake_pos );
+                    ];
+                pos = fake_pos;
+              })
+           "let function inc (x: int): int = x + 1 in inc(1) end";
+         basic_parse_test "mutual_function"
+           (LetExp
+              {
+                decs =
+                  [
+                    FunctionDec
+                      [
+                        {
+                          funname = fake_sym "ping";
+                          params = [];
+                          result = None;
+                          body =
+                            CallExp
+                              {
+                                func = fake_sym "pong";
+                                args = [];
+                                pos = fake_pos;
+                              };
+                          funpos = fake_pos;
+                        };
+                        {
+                          funname = fake_sym "pong";
+                          params = [];
+                          result = None;
+                          body =
+                            CallExp
+                              {
+                                func = fake_sym "ping";
+                                args = [];
+                                pos = fake_pos;
+                              };
+                          funpos = fake_pos;
+                        };
+                      ];
+                  ];
+                body =
+                  SeqExp
+                    [
+                      ( CallExp
+                          { func = fake_sym "ping"; args = []; pos = fake_pos },
+                        fake_pos );
+                    ];
+                pos = fake_pos;
+              })
+           "let function ping() = pong() and function pong() = ping() in \
+            ping() end";
        ]
