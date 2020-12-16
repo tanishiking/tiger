@@ -6,7 +6,7 @@
 %token <string>        STR
 %token <Symbol.symbol> ID
 %token                 EOF
-%token NIL DOT COMMA SEMICOLON
+%token NIL DOT COMMA SEMICOLON COLON
 %token ASSIGN
 %token LBRACKET RBRACKET
 %token LPAREN RPAREN
@@ -17,6 +17,7 @@
 %token FOR TO
 %token AT
 %token BREAK OF
+%token LET IN END VAR
 
 %nonassoc DO THEN OF
 %nonassoc ELSE
@@ -70,6 +71,25 @@ expr:
   | /* Added @ between ID and LBRACKET to avoid conflict (is there a way to avoid it ?) */
     typ=ID AT LBRACKET size=expr RBRACKET OF init=expr
     { ArrayExp { typ=typ; size=size; init=init; pos=to_pos($startpos) } }
+  | LET decs=decs IN expseq=expseq END
+    { LetExp { decs=decs; body=(SeqExp expseq); pos=to_pos($startpos) } }
+
+decs :
+    /* empty */ {[]}
+  | d=dec rest=decs {d :: rest}
+  ;
+
+dec : 
+  | d=vardec { d }
+  ;
+
+vardec:
+ | VAR v=ID t=type_constraint ASSIGN e=expr
+   { VarDec { name=v; typ=t; init=e; pos=to_pos($startpos) } }
+
+type_constraint:
+ | c=option(COLON t=ID { (t, to_pos($startpos)) })
+   { c }
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }

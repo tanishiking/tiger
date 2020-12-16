@@ -22,6 +22,10 @@ rule token = parse
   | "to"      { TO }
   | "break"   { BREAK }
   | "of"      { OF }
+  | "let"     { LET }
+  | "in"      { IN }
+  | "end"     { END }
+  | "var"     { VAR }
   | "@"       { AT }
   | '.'       { DOT }
   | ":="      { ASSIGN }
@@ -44,6 +48,7 @@ rule token = parse
   | "{"       { LBRACE }
   | "}"       { RBRACE }
   | ","       { COMMA }
+  | ":"       { COLON }
   | ";"       { SEMICOLON }
   | eof       { EOF }
   | id as i   { ID (Symbol.symbol i) }
