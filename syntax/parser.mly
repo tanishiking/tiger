@@ -50,7 +50,7 @@ expr:
     { ForExp { var=id; lo=lo; hi=hi; body=body; pos=to_pos($startpos) } }
   | BREAK
     { BreakExp (to_pos($startpos)) }
-  | LPAREN es=expseq RPAREN
+  | LPAREN es=separated_list(SEMICOLON, exppos) RPAREN
     { SeqExp es }
   | i = INT
     { IntExp i }
@@ -64,20 +64,15 @@ expr:
     { VarExp v }
   | lvalue=var ASSIGN e=expr
     { AssignExp {var=lvalue; exp=e; pos=to_pos($startpos)} }
-  | name=ID LPAREN args=argseq RPAREN
+  | name=ID LPAREN args=separated_list(COMMA, expr) RPAREN
     { CallExp { func=name; args=args; pos=to_pos($startpos) } }
-  | name=ID LBRACE fields=fieldseq RBRACE
+  | name=ID LBRACE fields=separated_list(COMMA, field) RBRACE
     { RecordExp { fields=fields; typ=name; pos=to_pos($startpos) } }
   | /* Added @ between ID and LBRACKET to avoid conflict (is there a way to avoid it ?) */
     typ=ID AT LBRACKET size=expr RBRACKET OF init=expr
     { ArrayExp { typ=typ; size=size; init=init; pos=to_pos($startpos) } }
-  | LET decs=decs IN expseq=expseq END
+  | LET decs=list(dec) IN expseq=separated_list(SEMICOLON, exppos) END
     { LetExp { decs=decs; body=(SeqExp expseq); pos=to_pos($startpos) } }
-
-decs :
-    /* empty */ {[]}
-  | d=dec rest=decs {d :: rest}
-  ;
 
 dec : 
   | d=vardec { d }
@@ -99,41 +94,17 @@ fundec:
 tyfield :
   | name=ID COLON typ=ID
     { { name=name; typ=typ; pos=to_pos($startpos) } }
-  ;
 
 var:
   | v=ID  { SimpleVar (v, to_pos($startpos)) }
   | v=var DOT f=ID { FieldVar (v, f, to_pos($startpos)) }
   | v=var LBRACKET e=expr RBRACKET { SubscriptVar (v, e, to_pos($startpos)) }
 
-argseq:
-    /* empty */ {[]}
-  | expr argseq_ {$1 :: $2}
-  ;
+field :
+  | k=ID EQ v=expr { (k, v, to_pos($startpos)) }
 
-argseq_:
-    /* empty */ {[]}
-  | COMMA expr argseq_ {$2 :: $3}
-
-fieldseq :
-    /* empty */ {[]}
-  | k=ID EQ v=expr rest=fieldseq_ {(k, v, to_pos($startpos)) :: rest}
-  ;
-
-fieldseq_ :
-    /* empty */ {[]}
-  | COMMA k=ID EQ v=expr rest=fieldseq_ {(k, v, to_pos($startpos)) :: rest}
-  ;
-
-expseq :
-    /* empty */ {[]}
-  | expr expseq_ { ($1, to_pos($startpos)) :: $2}
-  ;
-
-expseq_ :
-    /* empty */ {[]}
-  | SEMICOLON expr expseq_ { ($2, to_pos($startpos)) :: $3}
-  ;
+exppos :
+  | e=expr { (e, to_pos($startpos)) }
 
 %inline binop:
   | PLUS { PlusOp }
