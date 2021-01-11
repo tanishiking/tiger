@@ -1,5 +1,6 @@
 %{
   open Core.Ast
+  open Core.Sourcepos
 
   let to_pos (p : Lexing.position) : pos = { lnum = p.pos_lnum; bol = p.pos_bol }
 %}

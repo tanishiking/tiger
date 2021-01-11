@@ -1,6 +1,7 @@
 open OUnit2
 open Syntax
 open Core.Ast
+open Core.Sourcepos
 
 let parse p : exp =
   let lexbuf = Lexing.from_string p in
