@@ -1,3 +1,3 @@
-(test
- (libraries syntax core ounit2)
- (name parserTest))
+(tests
+ (libraries syntax semantic core ounit2)
+ (names parserTest semanticTest))

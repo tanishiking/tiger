@@ -34,13 +34,24 @@ let type_var (_, venv, var) : T.tpe * Tpd.typed_var =
           (T.actual_ty ty, Tpd.TypedSimpleVar (info, pos)) )
   | _ -> raise (Foo "unimplemented")
 
-let rec type_exp (((_ : E.tyenv), (_ : E.venv)) as env) exp :
+let rec type_exp (((tenv : E.tyenv), (venv : E.venv)) as env) exp :
     T.tpe * Tpd.typed_exp =
   match exp with
   | A.NilExp -> (T.NIL, Tpd.TypedNilExp)
   | A.IntExp i -> (T.INT, Tpd.TypedIntExp i)
   | A.StringExp (str, p) -> (T.STRING, Tpd.TypedStringExp (str, p))
-  (*| A.VarExp v -> (type_var tenv, venv, v) *)
+  | A.SeqExp exps ->
+      let ty, typed_exps =
+        List.fold_left
+          (fun (_, typed_exps_pos) (exp, pos) ->
+            let t, typed_exp = type_exp env exp in
+            (t, typed_exps_pos @ [ (typed_exp, pos) ]))
+          (T.UNIT, []) exps
+      in
+      (ty, TypedSeqExp typed_exps)
+  | A.VarExp v ->
+      let tvar, typed_var = type_var (tenv, venv, v) in
+      (tvar, TypedVarExp typed_var)
   | A.LetExp { decs; body; pos } ->
       let env', tpd_decs =
         List.fold_left
