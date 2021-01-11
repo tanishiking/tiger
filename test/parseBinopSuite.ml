@@ -1,6 +1,6 @@
 open OUnit2
 open Util
-open Syntax.Ast
+open Core.Ast
 
 let parse_binop_suite =
   "ParseBinOp"

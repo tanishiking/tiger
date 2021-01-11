@@ -1,15 +1,12 @@
 open OUnit2
 open Syntax
-open Syntax.Ast
-open Syntax.Symbol
+open Core.Ast
 
 let parse p : exp =
   let lexbuf = Lexing.from_string p in
   Parser.prog Lexer.token lexbuf
 
 let fake_pos : pos = { lnum = 0; bol = 0 }
-
-let fake_sym name = mk_symbol name 0
 
 (**
   @see https://www.cs.cornell.edu/courses/cs3110/2019sp/textbook/data/ounit_improved_output.html

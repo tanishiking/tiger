@@ -1,6 +1,6 @@
 open OUnit2
 open Util
-open Syntax.Ast
+open Core.Ast
 
 let parse_letexp_suite =
   "ParseLetExp"
@@ -12,7 +12,7 @@ let parse_letexp_suite =
                   [
                     VarDec
                       {
-                        name = fake_sym "v";
+                        name = "v";
                         typ = None;
                         init = IntExp 6;
                         pos = fake_pos;
@@ -23,9 +23,8 @@ let parse_letexp_suite =
                     [
                       ( CallExp
                           {
-                            func = fake_sym "print";
-                            args =
-                              [ VarExp (SimpleVar (fake_sym "v", fake_pos)) ];
+                            func = "print";
+                            args = [ VarExp (SimpleVar ("v", fake_pos)) ];
                             pos = fake_pos;
                           },
                         fake_pos );
@@ -40,8 +39,8 @@ let parse_letexp_suite =
                   [
                     VarDec
                       {
-                        name = fake_sym "v";
-                        typ = Some (fake_sym "int", fake_pos);
+                        name = "v";
+                        typ = Some ("int", fake_pos);
                         init = IntExp 6;
                         pos = fake_pos;
                       };
@@ -51,9 +50,8 @@ let parse_letexp_suite =
                     [
                       ( CallExp
                           {
-                            func = fake_sym "print";
-                            args =
-                              [ VarExp (SimpleVar (fake_sym "v", fake_pos)) ];
+                            func = "print";
+                            args = [ VarExp (SimpleVar ("v", fake_pos)) ];
                             pos = fake_pos;
                           },
                         fake_pos );
@@ -68,15 +66,15 @@ let parse_letexp_suite =
                   [
                     VarDec
                       {
-                        name = fake_sym "x";
-                        typ = Some (fake_sym "int", fake_pos);
+                        name = "x";
+                        typ = Some ("int", fake_pos);
                         init = IntExp 6;
                         pos = fake_pos;
                       };
                     VarDec
                       {
-                        name = fake_sym "y";
-                        typ = Some (fake_sym "string", fake_pos);
+                        name = "y";
+                        typ = Some ("string", fake_pos);
                         init = StringExp ("test", fake_pos);
                         pos = fake_pos;
                       };
@@ -86,17 +84,15 @@ let parse_letexp_suite =
                     [
                       ( CallExp
                           {
-                            func = fake_sym "print";
-                            args =
-                              [ VarExp (SimpleVar (fake_sym "x", fake_pos)) ];
+                            func = "print";
+                            args = [ VarExp (SimpleVar ("x", fake_pos)) ];
                             pos = fake_pos;
                           },
                         fake_pos );
                       ( CallExp
                           {
-                            func = fake_sym "print";
-                            args =
-                              [ VarExp (SimpleVar (fake_sym "y", fake_pos)) ];
+                            func = "print";
+                            args = [ VarExp (SimpleVar ("y", fake_pos)) ];
                             pos = fake_pos;
                           },
                         fake_pos );
@@ -112,8 +108,8 @@ let parse_letexp_suite =
                   [
                     VarDec
                       {
-                        name = fake_sym "x";
-                        typ = Some (fake_sym "int", fake_pos);
+                        name = "x";
+                        typ = Some ("int", fake_pos);
                         init = IntExp 6;
                         pos = fake_pos;
                       };
@@ -127,8 +123,8 @@ let parse_letexp_suite =
                               [
                                 VarDec
                                   {
-                                    name = fake_sym "y";
-                                    typ = Some (fake_sym "int", fake_pos);
+                                    name = "y";
+                                    typ = Some ("int", fake_pos);
                                     init = IntExp 6;
                                     pos = fake_pos;
                                   };
@@ -138,12 +134,9 @@ let parse_letexp_suite =
                                 [
                                   ( CallExp
                                       {
-                                        func = fake_sym "print";
+                                        func = "print";
                                         args =
-                                          [
-                                            VarExp
-                                              (SimpleVar (fake_sym "x", fake_pos));
-                                          ];
+                                          [ VarExp (SimpleVar ("x", fake_pos)) ];
                                         pos = fake_pos;
                                       },
                                     fake_pos );
@@ -163,21 +156,14 @@ let parse_letexp_suite =
                     FunctionDec
                       [
                         {
-                          funname = fake_sym "inc";
+                          funname = "inc";
                           params =
-                            [
-                              {
-                                name = fake_sym "x";
-                                typ = fake_sym "int";
-                                pos = fake_pos;
-                              };
-                            ];
-                          result = Some (fake_sym "int", fake_pos);
+                            [ { name = "x"; typ = "int"; pos = fake_pos } ];
+                          result = Some ("int", fake_pos);
                           body =
                             OpExp
                               {
-                                left =
-                                  VarExp (SimpleVar (fake_sym "x", fake_pos));
+                                left = VarExp (SimpleVar ("x", fake_pos));
                                 oper = PlusOp;
                                 right = IntExp 1;
                                 pos = fake_pos;
@@ -190,11 +176,7 @@ let parse_letexp_suite =
                   SeqExp
                     [
                       ( CallExp
-                          {
-                            func = fake_sym "inc";
-                            args = [ IntExp 1 ];
-                            pos = fake_pos;
-                          },
+                          { func = "inc"; args = [ IntExp 1 ]; pos = fake_pos },
                         fake_pos );
                     ];
                 pos = fake_pos;
@@ -208,29 +190,19 @@ let parse_letexp_suite =
                     FunctionDec
                       [
                         {
-                          funname = fake_sym "ping";
+                          funname = "ping";
                           params = [];
                           result = None;
                           body =
-                            CallExp
-                              {
-                                func = fake_sym "pong";
-                                args = [];
-                                pos = fake_pos;
-                              };
+                            CallExp { func = "pong"; args = []; pos = fake_pos };
                           funpos = fake_pos;
                         };
                         {
-                          funname = fake_sym "pong";
+                          funname = "pong";
                           params = [];
                           result = None;
                           body =
-                            CallExp
-                              {
-                                func = fake_sym "ping";
-                                args = [];
-                                pos = fake_pos;
-                              };
+                            CallExp { func = "ping"; args = []; pos = fake_pos };
                           funpos = fake_pos;
                         };
                       ];
@@ -238,8 +210,7 @@ let parse_letexp_suite =
                 body =
                   SeqExp
                     [
-                      ( CallExp
-                          { func = fake_sym "ping"; args = []; pos = fake_pos },
+                      ( CallExp { func = "ping"; args = []; pos = fake_pos },
                         fake_pos );
                     ];
                 pos = fake_pos;
@@ -254,31 +225,27 @@ let parse_letexp_suite =
                     TypeDec
                       [
                         {
-                          tyname = fake_sym "keyid";
-                          ty = NameTy (fake_sym "int", fake_pos);
+                          tyname = "keyid";
+                          ty = NameTy ("int", fake_pos);
                           typos = fake_pos;
                         };
                         {
-                          tyname = fake_sym "tree";
+                          tyname = "tree";
                           ty =
                             RecordTy
                               [
+                                { name = "key"; typ = "keyid"; pos = fake_pos };
                                 {
-                                  name = fake_sym "key";
-                                  typ = fake_sym "keyid";
-                                  pos = fake_pos;
-                                };
-                                {
-                                  name = fake_sym "children";
-                                  typ = fake_sym "treelist";
+                                  name = "children";
+                                  typ = "treelist";
                                   pos = fake_pos;
                                 };
                               ];
                           typos = fake_pos;
                         };
                         {
-                          tyname = fake_sym "treelist";
-                          ty = ArrayTy (fake_sym "tree", fake_pos);
+                          tyname = "treelist";
+                          ty = ArrayTy ("tree", fake_pos);
                           typos = fake_pos;
                         };
                       ];
@@ -288,7 +255,7 @@ let parse_letexp_suite =
                     [
                       ( CallExp
                           {
-                            func = fake_sym "print";
+                            func = "print";
                             args = [ IntExp 1 ];
                             pos = fake_pos;
                           },
@@ -306,29 +273,22 @@ let parse_letexp_suite =
                     TypeDec
                       [
                         {
-                          tyname = fake_sym "keyid";
-                          ty = NameTy (fake_sym "int", fake_pos);
+                          tyname = "keyid";
+                          ty = NameTy ("int", fake_pos);
                           typos = fake_pos;
                         };
                       ];
                     FunctionDec
                       [
                         {
-                          funname = fake_sym "inc";
+                          funname = "inc";
                           params =
-                            [
-                              {
-                                name = fake_sym "x";
-                                typ = fake_sym "int";
-                                pos = fake_pos;
-                              };
-                            ];
-                          result = Some (fake_sym "int", fake_pos);
+                            [ { name = "x"; typ = "int"; pos = fake_pos } ];
+                          result = Some ("int", fake_pos);
                           body =
                             OpExp
                               {
-                                left =
-                                  VarExp (SimpleVar (fake_sym "x", fake_pos));
+                                left = VarExp (SimpleVar ("x", fake_pos));
                                 oper = PlusOp;
                                 right = IntExp 1;
                                 pos = fake_pos;
@@ -338,7 +298,7 @@ let parse_letexp_suite =
                       ];
                     VarDec
                       {
-                        name = fake_sym "v";
+                        name = "v";
                         typ = None;
                         init = IntExp 1;
                         pos = fake_pos;
@@ -349,7 +309,7 @@ let parse_letexp_suite =
                     [
                       ( CallExp
                           {
-                            func = fake_sym "print";
+                            func = "print";
                             args = [ IntExp 1 ];
                             pos = fake_pos;
                           },

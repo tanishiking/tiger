@@ -1,7 +1,6 @@
 open OUnit2
 open Util
-open Syntax.Ast
-open Syntax.Symbol
+open Core.Ast
 
 let basic_suite =
   "Basic"
@@ -12,32 +11,26 @@ let basic_suite =
          basic_parse_test "multiple_digit" (IntExp 1234) "1234";
          basic_parse_test "basic_string" (StringExp ("foo", fake_pos)) "\"foo\"";
          basic_parse_test "simple_var"
-           (VarExp (SimpleVar (fake_sym "id", fake_pos)))
+           (VarExp (SimpleVar ("id", fake_pos)))
            "id";
          basic_parse_test "field_var"
-           (VarExp
-              (FieldVar
-                 (SimpleVar (fake_sym "obj", fake_pos), fake_sym "x", fake_pos)))
+           (VarExp (FieldVar (SimpleVar ("obj", fake_pos), "x", fake_pos)))
            "obj.x";
          basic_parse_test "field_chain"
            (VarExp
               (FieldVar
-                 ( FieldVar
-                     ( SimpleVar (fake_sym "obj", fake_pos),
-                       fake_sym "x",
-                       fake_pos ),
-                   fake_sym "y",
+                 ( FieldVar (SimpleVar ("obj", fake_pos), "x", fake_pos),
+                   "y",
                    fake_pos )))
            "obj.x.y";
          basic_parse_test "simple_subscription"
            (VarExp
-              (SubscriptVar
-                 (SimpleVar (fake_sym "list", fake_pos), IntExp 0, fake_pos)))
+              (SubscriptVar (SimpleVar ("list", fake_pos), IntExp 0, fake_pos)))
            "list[0]";
          basic_parse_test "simple_assign"
            (AssignExp
               {
-                var = SimpleVar (mk_symbol "obj" 0, fake_pos);
+                var = SimpleVar ("obj", fake_pos);
                 exp = IntExp 1;
                 pos = fake_pos;
               })
@@ -45,32 +38,29 @@ let basic_suite =
          basic_parse_test "basic_call"
            (CallExp
               {
-                func = fake_sym "func";
+                func = "func";
                 args =
                   [
-                    VarExp (SimpleVar (fake_sym "x", fake_pos));
-                    VarExp (SimpleVar (fake_sym "y", fake_pos));
+                    VarExp (SimpleVar ("x", fake_pos));
+                    VarExp (SimpleVar ("y", fake_pos));
                   ];
                 pos = fake_pos;
               })
            "func(x, y)";
          basic_parse_test "call_empty"
-           (CallExp { func = fake_sym "func"; args = []; pos = fake_pos })
+           (CallExp { func = "func"; args = []; pos = fake_pos })
            "func()";
          basic_parse_test "basic_record_creation"
            (RecordExp
               {
                 fields =
-                  [
-                    (fake_sym "line", IntExp 1, fake_pos);
-                    (fake_sym "col", IntExp 2, fake_pos);
-                  ];
-                typ = fake_sym "pos";
+                  [ ("line", IntExp 1, fake_pos); ("col", IntExp 2, fake_pos) ];
+                typ = "pos";
                 pos = fake_pos;
               })
            "pos { line = 1, col = 2 }";
          basic_parse_test "record_creation_empty"
-           (RecordExp { fields = []; typ = fake_sym "pos"; pos = fake_pos })
+           (RecordExp { fields = []; typ = "pos"; pos = fake_pos })
            "pos { }";
          basic_parse_test "empty_sequencing" (SeqExp []) "()";
          basic_parse_test "sequencing_int_int"
@@ -81,14 +71,14 @@ let basic_suite =
               [
                 ( AssignExp
                     {
-                      var = SimpleVar (fake_sym "x", fake_pos);
+                      var = SimpleVar ("x", fake_pos);
                       exp = IntExp 1;
                       pos = fake_pos;
                     },
                   fake_pos );
                 ( OpExp
                     {
-                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      left = VarExp (SimpleVar ("x", fake_pos));
                       oper = PlusOp;
                       right = IntExp 1;
                       pos = fake_pos;
@@ -102,12 +92,12 @@ let basic_suite =
                 test =
                   OpExp
                     {
-                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      left = VarExp (SimpleVar ("x", fake_pos));
                       oper = EqOp;
                       right = IntExp 1;
                       pos = fake_pos;
                     };
-                then' = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                then' = VarExp (SimpleVar ("x", fake_pos));
                 else' = None;
                 pos = fake_pos;
               })
@@ -118,12 +108,12 @@ let basic_suite =
                 test =
                   OpExp
                     {
-                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      left = VarExp (SimpleVar ("x", fake_pos));
                       oper = EqOp;
                       right = IntExp 1;
                       pos = fake_pos;
                     };
-                then' = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                then' = VarExp (SimpleVar ("x", fake_pos));
                 else' = Some (IntExp 1);
                 pos = fake_pos;
               })
@@ -134,7 +124,7 @@ let basic_suite =
                 test =
                   OpExp
                     {
-                      left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                      left = VarExp (SimpleVar ("x", fake_pos));
                       oper = LtOp;
                       right = IntExp 10;
                       pos = fake_pos;
@@ -142,11 +132,11 @@ let basic_suite =
                 body =
                   AssignExp
                     {
-                      var = SimpleVar (fake_sym "x", fake_pos);
+                      var = SimpleVar ("x", fake_pos);
                       exp =
                         OpExp
                           {
-                            left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                            left = VarExp (SimpleVar ("x", fake_pos));
                             oper = PlusOp;
                             right = IntExp 1;
                             pos = fake_pos;
@@ -159,17 +149,17 @@ let basic_suite =
          basic_parse_test "for_loop"
            (ForExp
               {
-                var = fake_sym "x";
+                var = "x";
                 lo = IntExp 0;
                 hi = IntExp 10;
                 body =
                   AssignExp
                     {
-                      var = SimpleVar (fake_sym "x", fake_pos);
+                      var = SimpleVar ("x", fake_pos);
                       exp =
                         OpExp
                           {
-                            left = VarExp (SimpleVar (fake_sym "x", fake_pos));
+                            left = VarExp (SimpleVar ("x", fake_pos));
                             oper = PlusOp;
                             right = IntExp 1;
                             pos = fake_pos;
@@ -183,7 +173,7 @@ let basic_suite =
          basic_parse_test "array"
            (ArrayExp
               {
-                typ = fake_sym "str";
+                typ = "str";
                 size = IntExp 100;
                 init = StringExp ("", fake_pos);
                 pos = fake_pos;

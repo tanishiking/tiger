@@ -1,5 +1,5 @@
 {
-open Parser
+  open Parser
 }
 
 let digit = ['0'-'9']
@@ -55,7 +55,7 @@ rule token = parse
   | ":"       { COLON }
   | ";"       { SEMICOLON }
   | eof       { EOF }
-  | id as i   { ID (Symbol.symbol i) }
+  | id as i   { ID (i) }
 
 and string buf = parse
   | '"'       { STR (Buffer.contents buf) }

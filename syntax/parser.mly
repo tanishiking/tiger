@@ -1,10 +1,12 @@
 %{
-  open Ast
+  open Core.Ast
+
+  let to_pos (p : Lexing.position) : pos = { lnum = p.pos_lnum; bol = p.pos_bol }
 %}
 
 %token <int>           INT
 %token <string>        STR
-%token <Symbol.symbol> ID
+%token <string>        ID
 %token                 EOF
 %token NIL DOT COMMA SEMICOLON COLON
 %token ASSIGN
@@ -30,7 +32,7 @@
 %left TIMES DIVIDE
 %nonassoc UMINUS
 
-%start <Ast.exp> prog
+%start <exp> prog
 
 %%
 
