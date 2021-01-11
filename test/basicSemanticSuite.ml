@@ -51,4 +51,5 @@ let basic_suite =
                 pos = fake_pos;
               })
            "let var x := 1 in x end";
+         semantic_error_test "undefined_variable" "x" "undefined variable x";
        ]

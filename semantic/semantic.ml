@@ -4,35 +4,41 @@ module T = Core.Types
 module E = Env
 module Tpd = Core.Tpd
 module Syminfo = Core.Syminfo
+module Error = Core.Error
 
-exception Foo of string
+let type_mismatch loc expected found =
+  Error.error loc "type mismatch: expected %s, found %s" (T.show_tpe expected)
+    (T.show_tpe found)
 
-let coerce ty1 ty2 =
-  if not (T.coerceable ty1 ty2) then
-    (* TODO: return Error instead of raising error *)
-    raise (Foo "type mismatch")
+let undefined loc kind id = Error.error loc "undefined %s %s" kind (S.name id)
 
-let lookup id env =
-  match Symtab.lookup id env with
-  | Some x -> x
-  | None -> raise (Foo "undefined")
+let misdefined loc kind id = Error.error loc "%s is not a %s" (S.name id) kind
 
-let vlookup id venv : E.enventry = lookup id venv
+let cannot_be_nil loc id =
+  Error.error loc "cannot initialize untyped variable %s with nil" (S.name id)
 
-let tylookup id tyenv : T.tpe = lookup id tyenv
+let coerce ty1 ty2 pos =
+  if not (T.coerceable ty1 ty2) then type_mismatch pos ty2 ty1
+
+let lookup id env pos kind =
+  match Symtab.lookup id env with Some x -> x | None -> undefined pos kind id
+
+let vlookup id venv pos : E.enventry = lookup id venv pos "variable"
+
+let tylookup id tyenv pos : T.tpe = lookup id tyenv pos "type"
 
 let type_var (_, venv, var) : T.tpe * Tpd.typed_var =
   match var with
   | A.SimpleVar (name, pos) -> (
       let sym = S.symbol name in
-      match vlookup sym venv with
-      | E.FunEntry _ -> raise (Foo "function cannot be here")
+      match vlookup sym venv pos with
+      | E.FunEntry _ -> misdefined pos "variable" sym
       | E.VarEntry { ty; _ } ->
           let info : Syminfo.info =
             { sym; kind = Syminfo.VAR; tpe = ty; role = Syminfo.REF; level = 0 }
           in
           (T.actual_ty ty, Tpd.TypedSimpleVar (info, pos)) )
-  | _ -> raise (Foo "unimplemented")
+  | _ -> Error.fatal "not implemented"
 
 let rec type_exp (((tenv : E.tyenv), (venv : E.venv)) as env) exp :
     T.tpe * Tpd.typed_exp =
@@ -62,18 +68,19 @@ let rec type_exp (((tenv : E.tyenv), (venv : E.venv)) as env) exp :
       in
       let t, typed_body = type_exp env' body in
       (t, TypedLetExp { decs = tpd_decs; body = typed_body; pos })
-  | _ -> raise (Foo "unimplemented")
+  | _ -> Error.fatal "not implemented"
 
 and type_dec ((tenv, venv) as env) dec : (E.tyenv * E.venv) * Tpd.typed_dec =
   match dec with
   | A.VarDec { name; typ; init; pos } ->
       let tinit, typed_init = type_exp env init in
+      let varsym = S.symbol name in
       let tvar, typed_typ =
         match typ with
         | Some (tname, pos) ->
             (* Check if typ and tinit matches *)
             let tsym = S.symbol tname in
-            let t = tylookup tsym tenv in
+            let t = tylookup tsym tenv pos in
             let tinfo : Syminfo.info =
               {
                 sym = tsym;
@@ -83,23 +90,28 @@ and type_dec ((tenv, venv) as env) dec : (E.tyenv * E.venv) * Tpd.typed_dec =
                 level = 0;
               }
             in
-            coerce tinit t;
+            coerce tinit t pos;
             (t, Some (tinfo, pos))
         | None ->
-            if T.coerceable tinit T.NIL then raise (Foo "cannot be nil")
+            if T.coerceable tinit T.NIL then cannot_be_nil pos varsym
             else (tinit, None)
       in
-      let sym = S.symbol name in
       let entry = E.VarEntry { ty = tvar; const = false } in
-      let venv' = Symtab.enter sym entry venv in
+      let venv' = Symtab.enter varsym entry venv in
       let info : Syminfo.info =
-        { sym; kind = Syminfo.VAR; tpe = tvar; role = Syminfo.DEF; level = 0 }
+        {
+          sym = varsym;
+          kind = Syminfo.VAR;
+          tpe = tvar;
+          role = Syminfo.DEF;
+          level = 0;
+        }
       in
       let typed_vardec =
         Tpd.TypedVarDec { name = info; typ = typed_typ; init = typed_init; pos }
       in
       ((tenv, venv'), typed_vardec)
-  | _ -> raise (Foo "unimplemented")
+  | _ -> Error.fatal "unimplemented"
 
 (* TODO: return type tree *)
 let type_prog (tree : A.exp) : Tpd.typed_exp =
